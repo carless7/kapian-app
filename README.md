@@ -1,6 +1,6 @@
 # Kapian
 
-Kapian is an Android application developed as part of the 4th-year course *Plataformes en Xarxa* at the School of Aerospace Engineering. The app focuses on digital business card sharing using NFC (Near Field Communication) technology.
+Kapian is an Android application developed as part of the 4th-year course *Plataformes en Xarxa* at the Universitat de Lleida. The app focuses on digital business card sharing using NFC (Near Field Communication) technology.
 
 ## 📱 Overview
 
@@ -36,7 +36,8 @@ Android SDK 30 or higher
 NFC-compatible Android device
 
 ## 👥 Authors
-Developed by [Carles Sànchez] and [Oscar van de Crommert], as part of the Plataformes en Xarxa course (4th year Computer Engineering)
+Developed by Carles Sànchez and Oscar van de Crommert, as part of the Plataformes en Xarxa course (4th year Computer Engineering)
 
 ## 📄 License
-This project is licensed for educational purposes. For any reuse or distribution, please contact the authors.
+
+This project is licensed under the [Apache License 2.0](LICENSE).
