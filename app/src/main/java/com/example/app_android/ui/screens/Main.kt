@@ -1,14 +1,11 @@
 package com.example.app_android.ui.screens
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.nfc.NfcAdapter
-import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,7 +27,7 @@ import com.example.app_android.ui.viewmodels.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun mainScreen(
+fun MainScreen(
     navController: NavController,
     sharedViewModel: SharedViewModel = viewModel()
 ) {

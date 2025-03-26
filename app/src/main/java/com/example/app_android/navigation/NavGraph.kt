@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.app_android.ui.screens.loadingScreen
 import com.example.app_android.ui.screens.loginScreen
-import com.example.app_android.ui.screens.mainScreen
+import com.example.app_android.ui.screens.MainScreen
 import com.example.app_android.ui.screens.registerScreen
 import com.example.app_android.ui.screens.settingsScreen
 import com.example.app_android.ui.viewmodels.SharedViewModel
@@ -28,7 +28,7 @@ fun AppNavigation() {
             registerScreen(navController)
         }
         composable("main"){
-            mainScreen(navController, sharedViewModel)
+            MainScreen(navController, sharedViewModel)
         }
         composable("settings"){
             settingsScreen(navController, sharedViewModel)
