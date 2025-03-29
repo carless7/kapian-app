@@ -1,22 +1,15 @@
-package com.example.app_android.ui.viewmodels
+package com.example.app_android.viewmodel
 
-import android.net.Uri
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.app_android.R
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 class SharedViewModel : ViewModel() {
-    val selectedImageUri = mutableStateOf<Uri?>(null)
-    val isUsingResource = mutableStateOf(true)
-    val resourceDrawableId = mutableStateOf(R.drawable.dni)
+    var selectedContact by mutableStateOf<String?>(null)
+        private set
 
-    fun setSelectedImage(uri: Uri?) {
-        selectedImageUri.value = uri
-        isUsingResource.value = false
-    }
-
-    fun resetToDefaultImage() {
-        selectedImageUri.value = null
-        isUsingResource.value = true
+    fun setContact(contact: String) {
+        selectedContact = contact
     }
 }

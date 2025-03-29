@@ -16,7 +16,7 @@ import androidx.navigation.NavController
 import com.example.app_android.R
 
 @Composable
-fun loadingScreen(navController: NavController) {
+fun LoadingScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         Handler(Looper.getMainLooper()).postDelayed({
             navController.navigate("login") {
@@ -31,7 +31,7 @@ fun loadingScreen(navController: NavController) {
     ) {
         Image(
             //TODO: posar logo
-            painter = painterResource(id = R.drawable.bonsly),
+            painter = painterResource(id = R.drawable.logo_kapian),
             contentDescription = "Loading Image",
             modifier = Modifier.size(200.dp)
         )

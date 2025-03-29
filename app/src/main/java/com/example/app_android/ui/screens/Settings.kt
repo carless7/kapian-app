@@ -1,23 +1,22 @@
 package com.example.app_android.ui.screens
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import android.content.Intent
+import android.nfc.NfcAdapter
+import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,90 +24,62 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.example.app_android.R
-import com.example.app_android.ui.viewmodels.SharedViewModel
+import com.example.app_android.viewmodel.SharedViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun settingsScreen(navController: NavController, sharedViewModel: SharedViewModel = viewModel()) {
-    var tempSelectedImageUri by remember { mutableStateOf<Uri?>(sharedViewModel.selectedImageUri.value) }
-    val isUsingResource = sharedViewModel.isUsingResource.value
-    val resourceDrawableId = sharedViewModel.resourceDrawableId.value
+fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewModel) {
+    val context = LocalContext.current
+    val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
+    var isNfcEnabled by remember { mutableStateOf(nfcAdapter?.isEnabled ?: false) }
+    var isDarkMode by remember { mutableStateOf(false) }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            tempSelectedImageUri = it
-        }
-    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top
+    ) {
+        Text(
+            text = "Settings",
+            style = MaterialTheme.typography.headlineMedium
+        )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Configuration") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.back),
-                            contentDescription = "Back"
-                        )
-                    }
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Enable NFC", modifier = Modifier.weight(1f))
+            Switch(
+                checked = isNfcEnabled,
+                onCheckedChange = {
+                    context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
                 }
             )
         }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+
+        HorizontalDivider()
+
+        Button(
+            onClick = { sharedViewModel.setContact("No contacts selected") },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            if (tempSelectedImageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(tempSelectedImageUri),
-                    contentDescription = "Image selected",
-                    modifier = Modifier.size(150.dp)
-                )
-            } else if (isUsingResource) {
-                Image(
-                    painter = painterResource(id = resourceDrawableId),
-                    contentDescription = "Default image",
-                    modifier = Modifier.size(150.dp)
-                )
-            }
+            Text("Clear Selected Contact")
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = { imagePickerLauncher.launch("image/*") }) {
-                Text("Change card")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(onClick = {
-                tempSelectedImageUri = null
-                sharedViewModel.resetToDefaultImage()
-            }) {
-                Text("Reset to Default")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(onClick = {
-                tempSelectedImageUri?.let {
-                    sharedViewModel.setSelectedImage(it)
-                }
-                navController.popBackStack()
-            }) {
-                Text("Apply")
-            }
+        Button(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Back to Home")
         }
     }
 }

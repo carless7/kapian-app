@@ -5,12 +5,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.app_android.ui.screens.loadingScreen
-import com.example.app_android.ui.screens.loginScreen
+import com.example.app_android.ui.screens.LoadingScreen
+import com.example.app_android.ui.screens.LoginScreen
 import com.example.app_android.ui.screens.MainScreen
-import com.example.app_android.ui.screens.registerScreen
-import com.example.app_android.ui.screens.settingsScreen
-import com.example.app_android.ui.viewmodels.SharedViewModel
+import com.example.app_android.ui.screens.RegisterScreen
+import com.example.app_android.ui.screens.SettingsScreen
+import com.example.app_android.viewmodel.SharedViewModel
 
 @Composable
 fun AppNavigation() {
@@ -19,19 +19,19 @@ fun AppNavigation() {
 
     NavHost(navController = navController, startDestination = "loading") {
         composable("loading"){
-            loadingScreen(navController)
+            LoadingScreen(navController)
         }
         composable("login"){
-            loginScreen(navController)
+            LoginScreen(navController)
         }
         composable("register"){
-            registerScreen(navController)
+            RegisterScreen(navController)
         }
         composable("main"){
             MainScreen(navController, sharedViewModel)
         }
         composable("settings"){
-            settingsScreen(navController, sharedViewModel)
+            SettingsScreen(navController, sharedViewModel)
         }
     }
 }
