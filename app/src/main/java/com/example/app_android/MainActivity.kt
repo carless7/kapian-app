@@ -2,9 +2,11 @@ package com.example.app_android
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.IntentFilter
 import android.nfc.*
 import android.nfc.tech.Ndef
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
@@ -29,11 +31,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-            PendingIntent.FLAG_MUTABLE
-        )
-        nfcAdapter?.enableForegroundDispatch(this, pendingIntent, null, null)
+        setupNfcForegroundDispatch()
     }
 
     override fun onPause() {
@@ -41,10 +39,37 @@ class MainActivity : ComponentActivity() {
         nfcAdapter?.disableForegroundDispatch(this)
     }
 
+    private fun setupNfcForegroundDispatch() {
+        if (nfcAdapter == null || !nfcAdapter!!.isEnabled) return
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_MUTABLE
+        )
+
+        // Set up intent filters for better NFC handling
+        val intentFilters = arrayOf(
+            IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED),
+            IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
+                addDataType("text/plain")
+                addDataType("text/x-vcard")
+            },
+            IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED)
+        )
+
+        // Set up tech lists
+        val techLists = arrayOf(arrayOf(Ndef::class.java.name))
+
+        nfcAdapter?.enableForegroundDispatch(this, pendingIntent, intentFilters, techLists)
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED || intent.action == NfcAdapter.ACTION_TAG_DISCOVERED) {
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action ||
+            NfcAdapter.ACTION_TAG_DISCOVERED == intent.action ||
+            NfcAdapter.ACTION_TECH_DISCOVERED == intent.action) {
+
             val tag: Tag? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
                 intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java) // API 33+
             } else {
@@ -53,25 +78,62 @@ class MainActivity : ComponentActivity() {
             }
 
             tag?.let {
-                sharedViewModel.selectedContact?.let { contact ->
-                    writeToNfc(it, contact)
+                val contactData = sharedViewModel.selectedContact
+                if (contactData != null) {
+                    val success = writeToNfc(it, contactData)
+                    val message = if (success) "Contact shared successfully via NFC"
+                    else "Failed to write to NFC tag"
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "No contact selected to share", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun writeToNfc(tag: Tag, data: String) {
-        val ndef = Ndef.get(tag)
-        ndef?.let {
-            try {
-                it.connect()
-                val ndefRecord = NdefRecord.createMime("text/plain", data.toByteArray())
-                val ndefMessage = NdefMessage(arrayOf(ndefRecord))
-                it.writeNdefMessage(ndefMessage)
-                it.close()
-            } catch (e: Exception) {
-                e.printStackTrace()
+    private fun writeToNfc(tag: Tag, contactData: String): Boolean {
+        val ndef = Ndef.get(tag) ?: return false
+
+        try {
+            ndef.connect()
+
+            if (!ndef.isWritable) {
+                Toast.makeText(this, "NFC tag is read-only", Toast.LENGTH_SHORT).show()
+                return false
             }
+
+            val lines = contactData.split("\n")
+            val name = lines[0]
+            val phone = if (lines.size > 1) lines[1] else ""
+
+            val vCardData = """
+                BEGIN:VCARD
+                VERSION:3.0
+                N:${name};;;
+                FN:${name}
+                TEL;TYPE=CELL:${phone}
+                END:VCARD
+            """.trimIndent()
+
+            val vCardRecord = NdefRecord.createMime(
+                "text/x-vcard",
+                vCardData.toByteArray()
+            )
+
+            val ndefMessage = NdefMessage(arrayOf(vCardRecord))
+
+            if (ndef.maxSize < ndefMessage.byteArrayLength) {
+                Toast.makeText(this, "NFC tag doesn't have enough space", Toast.LENGTH_SHORT).show()
+                return false
+            }
+
+            ndef.writeNdefMessage(ndefMessage)
+            ndef.close()
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error writing to NFC tag: ${e.message}", Toast.LENGTH_SHORT).show()
+            return false
         }
     }
 }

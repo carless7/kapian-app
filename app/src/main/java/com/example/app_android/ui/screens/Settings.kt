@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -33,7 +32,7 @@ import com.example.app_android.viewmodel.SharedViewModel
 fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewModel) {
     val context = LocalContext.current
     val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
-    var isNfcEnabled by remember { mutableStateOf(nfcAdapter?.isEnabled ?: false) }
+    val isNfcEnabled by remember { mutableStateOf(nfcAdapter?.isEnabled ?: false) }
     var isDarkMode by remember { mutableStateOf(false) }
 
     Column(

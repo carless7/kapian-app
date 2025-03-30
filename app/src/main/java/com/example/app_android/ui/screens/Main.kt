@@ -1,23 +1,37 @@
 package com.example.app_android.ui.screens
 
+import android.Manifest
 import android.content.Intent
-import android.nfc.NdefMessage
+import android.content.pm.PackageManager
 import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
-import android.nfc.Tag
-import android.nfc.tech.Ndef
 import android.provider.ContactsContract
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.app_android.viewmodel.SharedViewModel
@@ -29,6 +43,10 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val selectedContact = sharedViewModel.selectedContact
+    var hasContactPermission by remember { mutableStateOf(
+        ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) ==
+                PackageManager.PERMISSION_GRANTED
+    ) }
 
     val contactPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -58,6 +76,22 @@ fun MainScreen(
             }
         }
     }
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasContactPermission = isGranted
+        if (isGranted) {
+            val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+            contactPickerLauncher.launch(intent)
+        } else {
+            Toast.makeText(context, "Contact permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
+    val nfcAvailable = nfcAdapter != null
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -92,8 +126,12 @@ fun MainScreen(
 
         Button(
             onClick = {
-                val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
-                contactPickerLauncher.launch(intent)
+                if (hasContactPermission) {
+                    val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                    contactPickerLauncher.launch(intent)
+                } else {
+                    requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+                }
             }
         ) {
             Text("Select Contact")
@@ -103,19 +141,26 @@ fun MainScreen(
 
         Button(
             onClick = {
-                val nfcTag: Tag? = null
-                val success = writeNfcTag(nfcTag, selectedContact ?: "")
+                if (!nfcAvailable) {
+                    Toast.makeText(context, "NFC is not available on this device", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+
+                if (!nfcAdapter!!.isEnabled) {
+                    Toast.makeText(context, "Please enable NFC in settings", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+
                 Toast.makeText(
                     context,
-                    if (success) "NFC tag written!" else "Failed to write NFC tag",
+                    "Please hold your device near an NFC tag",
                     Toast.LENGTH_SHORT
                 ).show()
             },
-            enabled = selectedContact != null
+            enabled = selectedContact != null && nfcAvailable
         ) {
             Text("Share via NFC")
         }
-
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -123,7 +168,7 @@ fun MainScreen(
             Text("Go to Settings")
         }
     }
-} 
+}
 
 private fun createTextRecord(text: String): NdefRecord {
     val languageCode = "en".toByteArray()
@@ -136,21 +181,3 @@ private fun createTextRecord(text: String): NdefRecord {
 
     return NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, ByteArray(0), payload)
 }
-
-private fun writeNfcTag(tag: Tag?, data: String): Boolean {
-    if (tag == null) return false
-    try {
-        val ndef = Ndef.get(tag) ?: return false
-        ndef.connect()
-        val message = NdefMessage(arrayOf(createTextRecord(data)))
-        if (ndef.isWritable) {
-            ndef.writeNdefMessage(message)
-            ndef.close()
-            return true
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    return false
-}
-

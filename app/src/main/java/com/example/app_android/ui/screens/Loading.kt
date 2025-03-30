@@ -31,7 +31,7 @@ fun LoadingScreen(navController: NavController) {
     ) {
         Image(
             //TODO: posar logo
-            painter = painterResource(id = R.drawable.logo_kapian),
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = "Loading Image",
             modifier = Modifier.size(200.dp)
         )
