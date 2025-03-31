@@ -1,18 +1,25 @@
+// LoginScreen.kt
 package com.example.app_android.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.app_android.R
+import com.example.app_android.ui.components.KapianButton
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -22,22 +29,36 @@ fun LoginScreen(navController: NavController) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color(0xFFFFFFFF)
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = stringResource(R.string.login), style = MaterialTheme.typography.displayMedium)
-            Spacer(modifier = Modifier.height(26.dp))
+            // -- LOGO A LA PART SUPERIOR --
+            Image(
+                painter = painterResource(id = R.drawable.logo_name),
+                contentDescription = "Kapian Logo",
+                modifier = Modifier
+                    .size(300.dp)
+            )
 
+            Spacer(modifier = Modifier.height(2.dp))
+
+            // -- CAMPS DE TEXT --
             OutlinedTextField(
                 value = user,
                 onValueChange = { user = it },
                 label = { Text(stringResource(R.string.user)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                )
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -48,17 +69,27 @@ fun LoginScreen(navController: NavController) {
                 label = { Text(stringResource(R.string.password)) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // -- ERROR --
             if (errorMessage.isNotEmpty()) {
-                Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            Button(
+            // -- BOTONS --
+            KapianButton(
+                text = stringResource(R.string.login),
                 onClick = {
                     if (user.isNotEmpty() && password.isNotEmpty()) {
                         navController.navigate("main")
@@ -66,21 +97,14 @@ fun LoginScreen(navController: NavController) {
                         errorMessage = "Enter your credentials"
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF165FBD))
-            ) {
-                Text(text = stringResource(R.string.login))
-            }
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                onClick = {
-                    navController.navigate("register")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF165FBD))
-            ) {
-                Text(text = stringResource(R.string.register))
-            }
+            KapianButton(
+                text = stringResource(R.string.register),
+                onClick = { navController.navigate("register") },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
