@@ -12,6 +12,8 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.example.app_android.navigation.AppNavigation
 import com.example.app_android.viewmodel.SharedViewModel
+import com.example.app_android.ui.theme.KapianTheme
+
 
 class MainActivity : ComponentActivity() {
 
@@ -25,10 +27,11 @@ class MainActivity : ComponentActivity() {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         setContent {
-            AppNavigation()
+            KapianTheme { // Envoltem l'aplicació amb el tema personalitzat
+                AppNavigation()
+            }
         }
     }
-
     override fun onResume() {
         super.onResume()
         setupNfcForegroundDispatch()
