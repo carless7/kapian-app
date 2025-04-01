@@ -4,7 +4,7 @@
     <string name="logout">Log Out</string>
     <string name="user">User</string>
     <string name="password">Password</string>
-    <string name="register">New here? Register</string>
+    <string name="register">Register</string>
     <string name="no_cred">Please, enter your contact credentials</string>
     <string name="conf_pass">Confirm Password</string>
     <string name="selected_contact">Selected Contact:</string>
