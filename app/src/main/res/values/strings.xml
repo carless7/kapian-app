@@ -1,14 +1,15 @@
 <resources>
     <string name="app_name">Kapian</string>
     <string name="login">Log In</string>
+    <string name="logout">Log Out</string>
     <string name="user">User</string>
     <string name="password">Password</string>
-    <string name="register">REGISTER</string>
-    <string name="no_cred">Enter your credentials</string>
+    <string name="register">New here? Register</string>
+    <string name="no_cred">Please, enter your contact credentials</string>
     <string name="conf_pass">Confirm Password</string>
-    <string name="seleced_contaxt">Selected Contact:</string>
-    <string name="no_contaxt">No Contact Selected</string>
-    <string name="select_contact">Select Contact</string>
+    <string name="selected_contact">Selected Contact:</string>
+    <string name="no_contact">No Contact Selected</string>
+    <string name="select_contact">Select contact to share</string>
     <string name="no_NFC">NFC is not available on this device</string>
     <string name="enable_NFC">Please enable NFC in settings</string>
     <string name="settings_NFC">Please enable NFC in settings</string>
