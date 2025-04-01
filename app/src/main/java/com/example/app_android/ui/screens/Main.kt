@@ -3,44 +3,30 @@ package com.example.app_android.ui.screens
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.provider.ContactsContract
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.app_android.R
+import com.example.app_android.ui.components.KapianButton
 import com.example.app_android.viewmodel.SharedViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavController,
@@ -97,86 +83,107 @@ fun MainScreen(
     val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
     val nfcAvailable = nfcAdapter != null
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color(0xFFFFFFFF)
-    ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+    Scaffold(
+        // Barra superior centrada
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "App Logo",
+                        modifier = Modifier.size(64.dp)  // Ajusta la mida segons el teu gust
+                    )
+                },
+                actions = {
+                    IconButton(onClick = { navController.navigate("settings") }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.config),
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+            )
+        },
+        content = { innerPadding ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    // Per evitar que el contingut quedi amagat darrere la top bar,
+                    // afegim el padding que ens proporciona Scaffold
+                    .padding(innerPadding),
+                color = MaterialTheme.colorScheme.background
             ) {
-                Text(text = stringResource(R.string.seleced_contaxt), style = MaterialTheme.typography.bodyLarge)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    // Targeta per mostrar el contacte seleccionat
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = stringResource(R.string.selected_contact),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SelectionContainer {
+                                Text(
+                                    text = selectedContact ?: stringResource(R.string.no_cred),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                SelectionContainer {
-                    Text(
-                        text = selectedContact ?: stringResource(R.string.no_cred),
-                        style = MaterialTheme.typography.bodyMedium
+                    KapianButton(
+                        text = stringResource(R.string.select_contact),
+                        onClick = {
+                            if (hasContactPermission) {
+                                val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                                contactPickerLauncher.launch(intent)
+                            } else {
+                                requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Botó per compartir via NFC
+                    KapianButton(
+                        text = stringResource(R.string.share_NFC),
+                        onClick = {
+                            if (!nfcAvailable) {
+                                Toast.makeText(context, context.getString(R.string.no_NFC), Toast.LENGTH_SHORT).show()
+                                return@KapianButton
+                            }
+
+                            if (!nfcAdapter!!.isEnabled) {
+                                Toast.makeText(context, context.getString(R.string.settings_NFC), Toast.LENGTH_SHORT).show()
+                                return@KapianButton
+                            }
+
+                            Toast.makeText(context, context.getString(R.string.hold_NFC), Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                if (hasContactPermission) {
-                    val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
-                    contactPickerLauncher.launch(intent)
-                } else {
-                    requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-                }
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF165FBD))
-        ) {
-            Text(stringResource(R.string.select_contact))
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                if (!nfcAvailable) {
-                    Toast.makeText(context, context.getString(R.string.no_NFC), Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
-
-                if (!nfcAdapter!!.isEnabled) {
-                    Toast.makeText(context, context.getString(R.string.settings_NFC), Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
-
-                Toast.makeText(context, context.getString(R.string.hold_NFC), Toast.LENGTH_SHORT).show()
-            },
-            enabled = selectedContact != null && nfcAvailable,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF165FBD))
-        ) {
-            Text(stringResource(R.string.share_NFC))
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { navController.navigate("settings") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF165FBD))
-        ) {
-            Text(stringResource(R.string.go_set))
-        }
-    }
-    }
+    )
 }
