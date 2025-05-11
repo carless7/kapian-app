@@ -1,3 +1,9 @@
+/*
+TODO:
+-> Funcionalitats NFC
+	-> Integracio Firebase
+	-> Descarrega imatges desde firebase
+ */
 package com.example.app_android.ui.screens
 
 import android.Manifest
@@ -84,24 +90,30 @@ fun MainScreen(
     val nfcAvailable = nfcAdapter != null
 
     Scaffold(
-        // Barra superior centrada
         topBar = {
             CenterAlignedTopAppBar(
+                modifier = Modifier.height(100.dp),
                 title = {
                     Image(
-                        painter = painterResource(id = R.drawable.logo),
+                        painter = painterResource(id = R.drawable.logo_name),
                         contentDescription = "App Logo",
-                        modifier = Modifier.size(64.dp)  // Ajusta la mida segons el teu gust
+                        modifier = Modifier.size(150.dp)
                     )
                 },
                 actions = {
-                    IconButton(onClick = { navController.navigate("settings") }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.config),
-                            contentDescription = "Settings",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp)
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconButton(onClick = { navController.navigate("settings") }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.config),
+                                contentDescription = "Settings",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
                     }
                 }
             )
@@ -110,8 +122,6 @@ fun MainScreen(
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    // Per evitar que el contingut quedi amagat darrere la top bar,
-                    // afegim el padding que ens proporciona Scaffold
                     .padding(innerPadding),
                 color = MaterialTheme.colorScheme.background
             ) {
@@ -120,9 +130,8 @@ fun MainScreen(
                         .fillMaxSize()
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    // Targeta per mostrar el contacte seleccionat
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -164,7 +173,6 @@ fun MainScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Botó per compartir via NFC
                     KapianButton(
                         text = stringResource(R.string.share_NFC),
                         onClick = {
@@ -187,3 +195,5 @@ fun MainScreen(
         }
     )
 }
+
+

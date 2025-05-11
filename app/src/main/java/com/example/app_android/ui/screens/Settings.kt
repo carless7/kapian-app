@@ -1,3 +1,10 @@
+/*
+TODO:
+-> Settings desemvolupats
+	-> Dark mode
+	-> Log out
+	-> Carregar targeta
+ */
 package com.example.app_android.ui.screens
 
 import android.content.Intent
@@ -56,7 +63,7 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.back), // Assegura't de tenir aquest recurs o substitueix-lo
+                            painter = painterResource(id = R.drawable.back),
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -82,7 +89,6 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                // Secció per NFC
                 Text(
                     text = "NFC Settings",
                     style = MaterialTheme.typography.headlineSmall
@@ -102,7 +108,6 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                     Switch(
                         checked = isNfcEnabled,
                         onCheckedChange = {
-                            // Obrim la configuració NFC del dispositiu
                             context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
                         },
                         colors = SwitchDefaults.colors(
@@ -118,7 +123,6 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Botó per netejar el contacte seleccionat
                 KapianButton(
                     text = "Clear Selected Contact",
                     onClick = { sharedViewModel.setContact("No contacts selected") },
@@ -127,7 +131,6 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Botó per tornar a la pantalla principal
                 KapianButton(
                     text = "Back to Home",
                     onClick = { navController.popBackStack() },
@@ -136,13 +139,10 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Nou botó de Logout
                 KapianButton(
                     text = "Logout",
                     onClick = {
-                        // Per logout, podem netejar la sessió (si és necessari) i navegar a la pantalla de login.
                         navController.navigate("login") {
-                            // Elimina totes les rutes anteriors per evitar tornar enrere
                             popUpTo(0)
                         }
                     },
