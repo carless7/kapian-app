@@ -39,7 +39,7 @@ fun MainScreen(
     sharedViewModel: SharedViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val selectedContact = sharedViewModel.selectedCard
+    val selectedCard = sharedViewModel.selectedCard
     var hasContactPermission by remember { mutableStateOf(
         ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) ==
                 PackageManager.PERMISSION_GRANTED
@@ -143,7 +143,7 @@ fun MainScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = stringResource(R.string.selected_contact),
+                                text = stringResource(R.string.select_card),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -159,7 +159,7 @@ fun MainScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     KapianButton(
-                        text = stringResource(R.string.select_contact),
+                        text = stringResource(R.string.select_card),
                         onClick = {
                             if (hasContactPermission) {
                                 val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)

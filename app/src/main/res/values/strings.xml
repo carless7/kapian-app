@@ -7,9 +7,9 @@
     <string name="register">Register</string>
     <string name="no_cred">Please, enter your credentials</string>
     <string name="conf_pass">Confirm Password</string>
-    <string name="selected_contact">Selected Card:</string>
+    <string name="selected_card">Selected Card:</string>
     <string name="no_contact">No Card Selected</string>
-    <string name="select_contact">Select card to share</string>
+    <string name="select_card">Select card to share</string>
     <string name="no_NFC">NFC is not available on this device</string>
     <string name="enable_NFC">Please enable NFC in settings</string>
     <string name="settings_NFC">Please enable NFC in settings</string>
