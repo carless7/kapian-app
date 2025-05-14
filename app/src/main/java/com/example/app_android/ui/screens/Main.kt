@@ -39,7 +39,7 @@ fun MainScreen(
     sharedViewModel: SharedViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val selectedContact = sharedViewModel.selectedContact
+    val selectedContact = sharedViewModel.selectedCard
     var hasContactPermission by remember { mutableStateOf(
         ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) ==
                 PackageManager.PERMISSION_GRANTED
@@ -67,7 +67,7 @@ fun MainScreen(
                         val number = if (numberIndex != -1) cursor.getString(numberIndex) else ""
 
                         val contactInfo = "$name\n$number"
-                        sharedViewModel.setContact(contactInfo)
+                        sharedViewModel.setCard(contactInfo)
                     }
                 }
             }

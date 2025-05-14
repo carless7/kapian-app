@@ -124,8 +124,8 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                 Spacer(modifier = Modifier.height(24.dp))
 
                 KapianButton(
-                    text = "Clear Selected Contact",
-                    onClick = { sharedViewModel.setContact("No contacts selected") },
+                    text = "Clear Selected Card",
+                    onClick = { sharedViewModel.setCard("No card selected") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
