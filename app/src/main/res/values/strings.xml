@@ -16,4 +16,5 @@
     <string name="hold_NFC">Please hold your device near an NFC device</string>
     <string name="share_NFC">Share via NFC</string>
     <string name="go_set">Go to Settings</string>
+    <string name="google_web_sdk">388758009280-uihn4tsd0f9g47hb9mdu7jhp2qttspdo.apps.googleusercontent.com</string>
 </resources>

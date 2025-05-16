@@ -24,7 +24,7 @@ fun AppNavigation() {
             LoadingScreen(navController)
         }
         composable("login"){
-            LoginScreen(navController)
+            LoginScreen(navController, loginViewModel)
         }
         composable("register"){
             RegisterScreen(navController)
