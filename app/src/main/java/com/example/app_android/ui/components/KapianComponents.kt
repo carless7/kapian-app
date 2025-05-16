@@ -12,7 +12,8 @@ import androidx.compose.ui.Modifier
 fun KapianButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean
 ) {
     Button(
         onClick = onClick,

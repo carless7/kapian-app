@@ -126,7 +126,8 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                 KapianButton(
                     text = "Clear Selected Card",
                     onClick = { sharedViewModel.setCard("No card selected") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = true
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -134,7 +135,8 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                 KapianButton(
                     text = "Back to Home",
                     onClick = { navController.popBackStack() },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = true
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -146,7 +148,8 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                             popUpTo(0)
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = true
                 )
             }
         }

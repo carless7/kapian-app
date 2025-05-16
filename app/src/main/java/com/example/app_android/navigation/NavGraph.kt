@@ -17,7 +17,7 @@ fun AppNavigation() {
     val navController = rememberNavController()
     val sharedViewModel: SharedViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = "main") {
+    NavHost(navController = navController, startDestination = "loading") {
         composable("loading"){
             LoadingScreen(navController)
         }

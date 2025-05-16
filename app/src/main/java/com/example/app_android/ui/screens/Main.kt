@@ -147,12 +147,13 @@ fun MainScreen(
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Spacer(modifier = Modifier.height(8.dp))
+                            /*
                             SelectionContainer {
                                 Text(
-                                    text = selectedContact ?: stringResource(R.string.no_cred),
+                                    text = selectedCard ?: stringResource(R.string.no_cred),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
-                            }
+                            }*/
                         }
                     }
 
@@ -168,7 +169,8 @@ fun MainScreen(
                                 requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = true
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -188,7 +190,8 @@ fun MainScreen(
 
                             Toast.makeText(context, context.getString(R.string.hold_NFC), Toast.LENGTH_SHORT).show()
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = true
                     )
                 }
             }

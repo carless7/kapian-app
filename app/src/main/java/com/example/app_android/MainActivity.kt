@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    /*
     override fun onResume() {
         super.onResume()
         setupNfcForegroundDispatch()
@@ -81,7 +82,7 @@ class MainActivity : ComponentActivity() {
             }
 
             tag?.let {
-                val contactData = sharedViewModel.selectedContact
+                val contactData = sharedViewModel.selectedCard
                 if (contactData != null) {
                     val success = writeToNfc(it, contactData)
                     val message = if (success) "Contact shared successfully via NFC"
@@ -138,5 +139,5 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "Error writing to NFC tag: ${e.message}", Toast.LENGTH_SHORT).show()
             return false
         }
-    }
+    }*/
 }
