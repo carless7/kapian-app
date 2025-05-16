@@ -22,7 +22,7 @@ import com.example.app_android.viewmodel.LoginViewModel
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -31,7 +31,6 @@ fun LoginScreen(
     val loginState by viewModel.loginState.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState()
 
-    // Check if user is already logged in
     LaunchedEffect(currentUser) {
         if (currentUser != null) {
             navController.navigate("main") {
@@ -40,7 +39,6 @@ fun LoginScreen(
         }
     }
 
-    // Handle login state changes
     LaunchedEffect(loginState) {
         when (loginState) {
             is LoginViewModel.LoginState.Success -> {

@@ -42,11 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.app_android.R
 import com.example.app_android.ui.components.KapianButton
+import com.example.app_android.viewmodel.LoginViewModel
 import com.example.app_android.viewmodel.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewModel) {
+fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewModel, loginViewModel: LoginViewModel) {
     val context = LocalContext.current
     val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
     val isNfcEnabled by remember { mutableStateOf(nfcAdapter?.isEnabled ?: false) }
@@ -145,6 +146,7 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                     text = "Logout",
                     onClick = {
                         navController.navigate("login") {
+                            loginViewModel.signOut()
                             popUpTo(0)
                         }
                     },
