@@ -1,4 +1,3 @@
-// KapianComponents.kt
 package com.example.app_android.ui.components
 
 import androidx.compose.material3.Button
@@ -13,7 +12,8 @@ fun KapianButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean
+    enabled: Boolean,
+    leadingIcon: @Composable () -> Unit
 ) {
     Button(
         onClick = onClick,

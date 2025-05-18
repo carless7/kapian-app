@@ -1,9 +1,3 @@
-/*
-TODO:
--> Funcionalitats NFC
-	-> Integracio Firebase
-	-> Descarrega imatges desde firebase
- */
 package com.example.app_android.ui.screens
 
 import android.Manifest
@@ -16,7 +10,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -170,7 +163,14 @@ fun MainScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = true
+                        enabled = true,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.google_logo),
+                                contentDescription = "Google icon",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -191,7 +191,14 @@ fun MainScreen(
                             Toast.makeText(context, context.getString(R.string.hold_NFC), Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = true
+                        enabled = true,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.google_logo),
+                                contentDescription = "Google icon",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     )
                 }
             }

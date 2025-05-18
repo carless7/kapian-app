@@ -3,7 +3,6 @@
     <string name="login">Log In</string>
     <string name="logout">Log Out</string>
     <string name="user">User</string>
-    <string name="password">Password</string>
     <string name="register">Register</string>
     <string name="no_cred">Please, enter your credentials</string>
     <string name="conf_pass">Confirm Password</string>
@@ -16,5 +15,29 @@
     <string name="hold_NFC">Please hold your device near an NFC device</string>
     <string name="share_NFC">Share via NFC</string>
     <string name="go_set">Go to Settings</string>
-    <string name="google_web_sdk">388758009280-uihn4tsd0f9g47hb9mdu7jhp2qttspdo.apps.googleusercontent.com</string>
+    <string name="login_with_google">Login with Google</string>
+
+    <string name="error_invalid_google_credentials">Invalid Google credentials</string>
+    <string name="error_account_exists">Account already exists with different credentials</string>
+    <string name="error_google_signin_failed">Google sign-in failed</string>
+    <string name="error_unknown">An unknown error occurred</string>
+    <string name="error_signin_cancelled">Sign in cancelled</string>
+    <string name="error_signin_failed">Sign in failed. Try again</string>
+    <string name="error_google_signin_code">Google sign-in error: %d</string>
+    <string name="error_signin_interrupted">Google sign-in was interrupted</string>
+    <string name="error_empty_fields">Please fill all fields</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_short_password">Password should be at least 6 characters</string>
+    <string name="error_invalid_email">Please enter a valid email address</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_up_with_google">Sign up with Google</string>
+    <string name="dont_have_account">Don\'t have an account? Register</string>
+    <string name="already_have_account">Already have an account? Sign in</string>
+    <string name="default_web_client_id">388758009280-uihn4tsd0f9g47hb9mdu7jhp2qttspdo.apps.googleusercontent.com</string>
+    <string name="register_google">Register with Google</string>
+
 </resources>

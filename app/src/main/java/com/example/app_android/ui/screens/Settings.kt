@@ -1,10 +1,3 @@
-/*
-TODO:
--> Settings desemvolupats
-	-> Dark mode
-	-> Log out
-	-> Carregar targeta
- */
 package com.example.app_android.ui.screens
 
 import android.content.Intent
@@ -18,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -128,7 +122,14 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                     text = "Clear Selected Card",
                     onClick = { sharedViewModel.setCard("No card selected") },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = true
+                    enabled = true,
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.google_logo),
+                            contentDescription = "Google icon",
+                            modifier = Modifier.Companion.size(24.dp)
+                        )
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -137,7 +138,14 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                     text = "Back to Home",
                     onClick = { navController.popBackStack() },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = true
+                    enabled = true,
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.google_logo),
+                            contentDescription = "Google icon",
+                            modifier = Modifier.Companion.size(24.dp)
+                        )
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -145,13 +153,21 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                 KapianButton(
                     text = "Logout",
                     onClick = {
+                        loginViewModel.signOut()
+
                         navController.navigate("login") {
-                            loginViewModel.signOut()
                             popUpTo(0)
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = true
+                    enabled = true,
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.google_logo ),
+                            contentDescription = "Google icon",
+                            modifier = Modifier.Companion.size(24.dp)
+                        )
+                    }
                 )
             }
         }
