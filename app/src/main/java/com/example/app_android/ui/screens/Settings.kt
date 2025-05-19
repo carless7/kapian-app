@@ -1,54 +1,34 @@
 package com.example.app_android.ui.screens
 
-import android.content.Intent
-import android.nfc.NfcAdapter
-import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.app_android.R
-import com.example.app_android.ui.components.KapianButton
-import com.example.app_android.viewmodel.LoginViewModel
-import com.example.app_android.viewmodel.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewModel, loginViewModel: LoginViewModel) {
-    val context = LocalContext.current
-    val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
-    val isNfcEnabled by remember { mutableStateOf(nfcAdapter?.isEnabled ?: false) }
-
+fun SettingsScreen(navController: NavController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -99,42 +79,13 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        Switch(
-                            checked = isNfcEnabled,
-                            onCheckedChange = {
-                                context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                uncheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                            )
-                        )
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    KapianButton(
-                        text = "Logout",
-                        onClick = {
-                            loginViewModel.signOut()
-                            navController.navigate("login") {
-                                popUpTo(0)
-                            }
-                        },
-                        modifier = Modifier.width(250.dp),
-                        enabled = true,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.google_logo),
-                                contentDescription = "Google icon",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    )
+
                 }
             }
         }
     }
-
-
 }

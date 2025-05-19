@@ -3,31 +3,33 @@ package com.example.app_android.viewmodel
 import androidx.core.app.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.app_android.auth.AuthResponse
 import com.example.app_android.auth.AuthState
 import com.example.app_android.auth.AuthenticationManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.example.app_android.auth.AuthResponse
 
-class LoginViewModel(
+class RegisterViewModel(
     private val authManager: AuthenticationManager
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow<AuthState>(AuthState.Idle)
-    val loginState: StateFlow<AuthState> = _loginState
+    private val _registerState = MutableStateFlow<AuthState>(AuthState.Idle)
+    val registerState: StateFlow<AuthState> = _registerState
 
-    fun login(email: String, password: String) {
-        _loginState.value = AuthState.Loading
+    private val _emailVerificationState = MutableStateFlow<AuthState>(AuthState.Idle)
+
+    fun register(email: String, password: String) {
+        _registerState.value = AuthState.Loading
         viewModelScope.launch {
-            authManager.logInWithEmail(email, password).collectLatest { response ->
+            authManager.createAccountWithEmail(email, password).collectLatest { response ->
                 when (response) {
                     is AuthResponse.Success -> {
-                        _loginState.value = AuthState.Success()
+                        _registerState.value = AuthState.Success()
                     }
                     is AuthResponse.Error -> {
-                        _loginState.value = AuthState.Error("Login Error")
+                        _registerState.value = AuthState.Error("Register Error")
                     }
                 }
             }
@@ -35,15 +37,15 @@ class LoginViewModel(
     }
 
     fun signInWithGoogle(activity: ComponentActivity) {
-        _loginState.value = AuthState.Loading
+        _registerState.value = AuthState.Loading
         viewModelScope.launch {
             authManager.signInWithGoogle(activity).collect { response ->
                 when (response) {
                     is AuthResponse.Success -> {
-                        _loginState.value = AuthState.Success()
+                        _registerState.value = AuthState.Success()
                     }
                     is AuthResponse.Error -> {
-                        _loginState.value = AuthState.Error("Login Error")
+                        _registerState.value = AuthState.Error(response.message)
                     }
                 }
             }
@@ -51,6 +53,7 @@ class LoginViewModel(
     }
 
     fun clearStates() {
-        _loginState.value = AuthState.Idle
+        _registerState.value = AuthState.Idle
+        _emailVerificationState.value = AuthState.Idle
     }
 }
