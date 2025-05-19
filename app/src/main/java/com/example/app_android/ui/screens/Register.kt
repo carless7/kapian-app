@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -42,6 +47,7 @@ import com.example.app_android.auth.AuthState
 import com.example.app_android.auth.AuthenticationManager
 import com.example.app_android.viewmodel.RegisterViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     navController: NavController,
@@ -63,115 +69,157 @@ fun RegisterScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Register", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(32.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-
-        Button(
-            onClick = {
-                if (password == confirmPassword) {
-                    viewModel.register(email, password)
-                } else {
-                    viewModel.clearStates()
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = registerState !is AuthState.Loading
-        ) {
-            Text("Register")
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                viewModel.signInWithGoogle(activity)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = registerState !is AuthState.Loading,
-            colors = ButtonDefaults.run {
-                buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Create account",
+                        style = MaterialTheme.typography.headlineMedium
                     )
-            }
+                }
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "App Logo",
+                modifier = Modifier.size(160.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("Confirm Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    if (password == confirmPassword) {
+                        viewModel.register(email, password)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = registerState !is AuthState.Loading
+            ) {
+                if (registerState is AuthState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Creating account...")
+                } else {
+                    Text("Create Account")
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
             Row(
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Divider(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = "OR",
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Divider(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { viewModel.signInWithGoogle(activity) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                ),
+                enabled = registerState !is AuthState.Loading
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.google_logo),
+                        contentDescription = "Google logo",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Continue with Google")
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.google_logo),
-                    contentDescription = "Google logo",
-                    modifier = Modifier.size(24.dp)
+                Text("Already have an account? ")
+                ClickableText(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Medium
+                            )
+                        ) {
+                            append("Login")
+                        }
+                    },
+                    onClick = { navController.navigate("login") }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Sign up with Google")
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        ClickableText(
-            text = buildAnnotatedString {
-                append("Already have an account? ")
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                    append("Login")
-                }
-            },
-            onClick = { navController.navigate("login") }
-        )
-        when (registerState) {
-            is AuthState.Error -> {
+            if (registerState is AuthState.Error) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    (registerState as AuthState.Error).message,
-                    color = MaterialTheme.colorScheme.error
+                    text = (registerState as AuthState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(modifier = Modifier.height(8.dp))
             }
-            is AuthState.Loading -> {
-                CircularProgressIndicator()
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            is AuthState.Success -> {
-                navController.navigate("main") {
-                    popUpTo("register") { inclusive = true }
-                }
-            }
-            else -> {}
         }
     }
 }
