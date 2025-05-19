@@ -167,7 +167,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
             is AuthState.Success -> {
-                navController.navigate("login") {
+                navController.navigate("main") {
                     popUpTo("register") { inclusive = true }
                 }
             }
