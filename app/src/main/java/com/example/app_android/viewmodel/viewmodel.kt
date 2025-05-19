@@ -1,47 +1,64 @@
 package com.example.app_android.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.app_android.ui.datastore.UserPreferencesRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.util.UUID
 
-class SharedViewModel(application: Application) : AndroidViewModel(application) {
+class SharedViewModel : ViewModel() {
+    private val _isNfcReady = MutableLiveData<Boolean>(false)
+    val isNfcReady: LiveData<Boolean> get() = _isNfcReady
 
-    private val userPreferencesRepository = UserPreferencesRepository(application)
-    private val _cardName = MutableLiveData<String>("No card selected")
-    val cardName: LiveData<String> = _cardName
-    val isDarkMode = userPreferencesRepository.isDarkMode.asLiveData()
-    val selectedCard = userPreferencesRepository.selectedCard.asLiveData()
+    private val _nfcShareableUrl = MutableLiveData<String?>()
+    val nfcShareableUrl: MutableLiveData<String?> get() = _nfcShareableUrl
 
-    init {
+    private val _loading = MutableLiveData<Boolean>(false)
+    val loading: LiveData<Boolean> get() = _loading
+
+    private val _errorMessage = MutableLiveData<String?>(null)
+    val errorMessage: LiveData<String?> get() = _errorMessage
+
+    fun uploadImageToFirebase(imageUri: Uri) {
         viewModelScope.launch {
-            userPreferencesRepository.selectedCard.collect { card ->
-                _cardName.value = card
+            _loading.value = true
+            _errorMessage.value = null
+
+            try {
+                val url = uploadImage(imageUri)
+                _nfcShareableUrl.value = url
+                _isNfcReady.value = true
+            } catch (e: Exception) {
+                _errorMessage.value = e.message ?: "Unknown error occurred"
+                _isNfcReady.value = false
+            } finally {
+                _loading.value = false
             }
         }
     }
 
-    fun setCard(name: String) {
-        viewModelScope.launch {
-            userPreferencesRepository.saveSelectedCard(name)
-            _cardName.value = name
+    private suspend fun uploadImage(uri: Uri): String {
+        return withContext(Dispatchers.IO) {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+                ?: throw Exception("User not authenticated")
+
+            val storageRef = FirebaseStorage.getInstance().reference
+            val imageRef = storageRef.child("users/$userId/${UUID.randomUUID()}.png")
+
+            val uploadTask = imageRef.putFile(uri).await()
+            uploadTask.storage.downloadUrl.await().toString()
         }
     }
 
-    fun clearCard() {
-        viewModelScope.launch {
-            userPreferencesRepository.clearSelectedCard()
-            _cardName.value = "No card selected"
-        }
-    }
-
-    fun toggleDarkMode(enabled: Boolean) {
-        viewModelScope.launch {
-            userPreferencesRepository.saveDarkModePreference(enabled)
-        }
+    fun resetNfcState() {
+        _isNfcReady.value = false
+        _nfcShareableUrl.value = null
     }
 }

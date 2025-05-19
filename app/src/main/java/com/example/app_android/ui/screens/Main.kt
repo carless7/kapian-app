@@ -1,209 +1,182 @@
 package com.example.app_android.ui.screens
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.nfc.NfcAdapter
-import android.provider.ContactsContract
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.example.app_android.MainActivity
 import com.example.app_android.R
-import com.example.app_android.ui.components.KapianButton
 import com.example.app_android.viewmodel.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavController,
-    sharedViewModel: SharedViewModel = viewModel()
+    sharedViewModel: SharedViewModel
 ) {
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val isLoading by sharedViewModel.loading.observeAsState(false)
+    val isNfcReady by sharedViewModel.isNfcReady.observeAsState(false)
+    val nfcUrl by sharedViewModel.nfcShareableUrl.observeAsState("")
+    val errorMessage by sharedViewModel.errorMessage.observeAsState(null)
+
     val context = LocalContext.current
-    val selectedCard = sharedViewModel.selectedCard
-    var hasContactPermission by remember { mutableStateOf(
-        ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) ==
-                PackageManager.PERMISSION_GRANTED
-    ) }
+    val coroutineScope = rememberCoroutineScope()
 
-    val contactPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
-            result.data?.data?.let { contactUri ->
-                val projection = arrayOf(
-                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                    ContactsContract.CommonDataKinds.Phone.NUMBER,
-                    ContactsContract.CommonDataKinds.Email.ADDRESS
-                )
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            imageUri = it
+        }
+    }
 
-                context.contentResolver.query(
-                    contactUri, projection, null, null, null
-                )?.use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-                        val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-
-                        val name = if (nameIndex != -1) cursor.getString(nameIndex) else "Unknown"
-                        val number = if (numberIndex != -1) cursor.getString(numberIndex) else ""
-
-                        val contactInfo = "$name\n$number"
-                        sharedViewModel.setCard(contactInfo)
-                    }
-                }
+    LaunchedEffect(nfcUrl) {
+        if (!nfcUrl.isNullOrEmpty()) {
+            try {
+                (context as? MainActivity)?.setHceContent(nfcUrl!!)
+                Toast.makeText(context, "Ready to share via NFC", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(context, "NFC Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasContactPermission = isGranted
-        if (isGranted) {
-            val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
-            contactPickerLauncher.launch(intent)
-        } else {
-            Toast.makeText(context, "Contact permission denied", Toast.LENGTH_SHORT).show()
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         }
     }
-
-    val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
-    val nfcAvailable = nfcAdapter != null
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 modifier = Modifier.height(100.dp),
-                title = {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_name),
-                        contentDescription = "App Logo",
-                        modifier = Modifier.size(150.dp)
-                    )
-                },
+                title = {},
                 actions = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        IconButton(onClick = { navController.navigate("settings") }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.config),
-                                contentDescription = "Settings",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                    IconButton(onClick = { navController.navigate("settings") }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.config),
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(32.dp)
+                        )
                     }
                 }
             )
-        },
-        content = { innerPadding ->
-            Surface(
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                color = MaterialTheme.colorScheme.background
+                    .size(300.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.LightGray),
+                contentAlignment = Alignment.Center
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = stringResource(R.string.select_card),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            /*
-                            SelectionContainer {
-                                Text(
-                                    text = selectedCard ?: stringResource(R.string.no_cred),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }*/
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    KapianButton(
-                        text = stringResource(R.string.select_card),
-                        onClick = {
-                            if (hasContactPermission) {
-                                val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
-                                contactPickerLauncher.launch(intent)
-                            } else {
-                                requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = true,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.google_logo),
-                                contentDescription = "Google icon",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                if (imageUri != null) {
+                    AsyncImage(
+                        model = imageUri,
+                        contentDescription = "Selected image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    KapianButton(
-                        text = stringResource(R.string.share_NFC),
-                        onClick = {
-                            if (!nfcAvailable) {
-                                Toast.makeText(context, context.getString(R.string.no_NFC), Toast.LENGTH_SHORT).show()
-                                return@KapianButton
-                            }
-
-                            if (!nfcAdapter!!.isEnabled) {
-                                Toast.makeText(context, context.getString(R.string.settings_NFC), Toast.LENGTH_SHORT).show()
-                                return@KapianButton
-                            }
-
-                            Toast.makeText(context, context.getString(R.string.hold_NFC), Toast.LENGTH_SHORT).show()
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = true,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.google_logo),
-                                contentDescription = "Google icon",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.text_placeholder),
+                        contentDescription = "Image placeholder",
+                        modifier = Modifier.size(300.dp)
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            if (isLoading) {
+                CircularProgressIndicator()
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            if (isNfcReady) {
+                Text("Image ready to share! Place device back-to-back with another phone.")
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = {
+                        imagePickerLauncher.launch("image/*")
+                    }
+                ) {
+                    Text("Change Image")
+                }
+
+                Button(
+                    onClick = {
+                        imageUri?.let { uri ->
+                            sharedViewModel.uploadImageToFirebase(uri)
+                        } ?: run {
+                            Toast.makeText(context, "Please select an image first", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    enabled = !isLoading && imageUri != null
+                ) {
+                    Text("Share via NFC")
+                }
+            }
         }
-    )
+    }
 }
-
-

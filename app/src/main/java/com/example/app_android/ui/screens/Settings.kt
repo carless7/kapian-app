@@ -4,6 +4,7 @@ import android.content.Intent
 import android.nfc.NfcAdapter
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -77,99 +80,61 @@ fun SettingsScreen(navController: NavController, sharedViewModel: SharedViewMode
                 .padding(innerPadding),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "NFC Settings",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Text(
-                        text = "Enable NFC",
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Switch(
-                        checked = isNfcEnabled,
-                        onCheckedChange = {
-                            context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Go to NFC Settings",
+                            style = MaterialTheme.typography.bodyLarge
                         )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Switch(
+                            checked = isNfcEnabled,
+                            onCheckedChange = {
+                                context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
+                            },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                uncheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    KapianButton(
+                        text = "Logout",
+                        onClick = {
+                            loginViewModel.signOut()
+                            navController.navigate("login") {
+                                popUpTo(0)
+                            }
+                        },
+                        modifier = Modifier.width(250.dp),
+                        enabled = true,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.google_logo),
+                                contentDescription = "Google icon",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     )
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-
-                KapianButton(
-                    text = "Clear Selected Card",
-                    onClick = { sharedViewModel.setCard("No card selected") },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = true,
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.google_logo),
-                            contentDescription = "Google icon",
-                            modifier = Modifier.Companion.size(24.dp)
-                        )
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                KapianButton(
-                    text = "Back to Home",
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = true,
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.google_logo),
-                            contentDescription = "Google icon",
-                            modifier = Modifier.Companion.size(24.dp)
-                        )
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                KapianButton(
-                    text = "Logout",
-                    onClick = {
-                        loginViewModel.signOut()
-
-                        navController.navigate("login") {
-                            popUpTo(0)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = true,
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.google_logo ),
-                            contentDescription = "Google icon",
-                            modifier = Modifier.Companion.size(24.dp)
-                        )
-                    }
-                )
             }
         }
     }
+
+
 }

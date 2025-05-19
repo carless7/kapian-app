@@ -39,5 +39,7 @@
     <string name="already_have_account">Already have an account? Sign in</string>
     <string name="default_web_client_id">388758009280-uihn4tsd0f9g47hb9mdu7jhp2qttspdo.apps.googleusercontent.com</string>
     <string name="register_google">Register with Google</string>
+    <string name="hce_service_description">NFC Card Emulation Service</string>
+    <string name="aid_group_description">Share data with other devices</string>
 
 </resources>

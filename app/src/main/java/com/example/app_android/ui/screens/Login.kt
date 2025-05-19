@@ -1,4 +1,3 @@
-
 package com.example.app_android.ui.screens
 
 import android.app.Activity
