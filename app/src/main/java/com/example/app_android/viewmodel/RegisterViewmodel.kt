@@ -1,5 +1,6 @@
 package com.example.app_android.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.core.app.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,6 +35,7 @@ class RegisterViewModel(
         }
     }
 
+    @SuppressLint("RestrictedApi")
     fun signInWithGoogle(activity: ComponentActivity) {
         _registerState.value = AuthState.Loading
         viewModelScope.launch {

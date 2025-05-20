@@ -1,5 +1,6 @@
 package com.example.app_android.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.core.app.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,7 +35,7 @@ class LoginViewModel(
         }
     }
 
-    fun signInWithGoogle(activity: ComponentActivity) {
+    fun signInWithGoogle(@SuppressLint("RestrictedApi") activity: ComponentActivity) {
         _loginState.value = AuthState.Loading
         viewModelScope.launch {
             authManager.signInWithGoogle(activity).collect { response ->
