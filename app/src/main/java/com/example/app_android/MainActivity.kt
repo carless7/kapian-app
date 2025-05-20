@@ -7,6 +7,7 @@ import com.example.app_android.navigation.AppNavigation
 import com.example.app_android.ui.theme.KapianTheme
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
+import com.example.app_android.notifications.FirebaseMessagingUtils
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,5 +20,6 @@ class MainActivity : ComponentActivity() {
                    AppNavigation()
             }
         }
+        FirebaseMessagingUtils.updateFcmToken()
     }
 }
