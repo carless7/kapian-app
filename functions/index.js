@@ -1,16 +1,4 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
-
-const functions = require("firebase-functions");
+const functions = require("firebase-functions/v1"); // ✅ Use v1 for storage triggers
 const admin = require("firebase-admin");
 
 admin.initializeApp();
@@ -24,7 +12,7 @@ exports.notifyOnImageUpload = functions.storage.object().onFinalize(async (objec
   }
 
   const pathParts = filePath.split("/");
-  const userId = pathParts[1]; // assuming path is like "images/{userId}/{filename}"
+  const userId = pathParts[1]; 
 
   if (!userId) {
     console.error("User ID not found in file path");
@@ -50,7 +38,7 @@ exports.notifyOnImageUpload = functions.storage.object().onFinalize(async (objec
       token: fcmToken,
       notification: {
         title: "Upload Complete",
-        body: "Your image has been successfully uploaded and processed.",
+        body: "Your buissnes card has been successfully uploaded.",
       },
     };
 
