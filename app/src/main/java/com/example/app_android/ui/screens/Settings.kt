@@ -132,6 +132,7 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                         )
                     }
+                    Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         onClick = {
                             authManager.signOut()

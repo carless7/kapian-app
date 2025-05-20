@@ -8,6 +8,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,57 +37,69 @@ class UploadViewmodel : ViewModel() {
     val errorMessage: StateFlow<String?> = _errorMessage
 
     private val storageRef = Firebase.storage.reference
-    private val auth: FirebaseAuth = Firebase.auth
+    private val firestore = Firebase.firestore
 
-    private val database: DatabaseReference = Firebase.database.reference
-    private fun getCurrentUserId() = Firebase.auth.currentUser?.uid ?: ""
+    private val currentUserId: String?
+        get() = Firebase.auth.currentUser?.uid
 
-    private fun saveImageUrlToRealtimeDB(imageUrl: String) {
-        Firebase.database.reference
-            .child("users")
-            .child(getCurrentUserId())
-            .child("imageUrl")
-            .setValue(imageUrl)
+    private fun saveImageUrlToFirestore(imageUrl: String) {
+        val userId = currentUserId ?: run {
+            Log.e("UploadViewmodel", "No user logged in when saving URL")
+            return
+        }
+
+        val userData = hashMapOf(
+            "imageUrl" to imageUrl,
+            "lastUpdated" to FieldValue.serverTimestamp()
+        )
+
+        firestore.collection("users")
+            .document(userId)
+            .set(userData)
             .addOnSuccessListener {
-                Log.d("UploadViewmodel", "URL saved to Realtime DB")
+                Log.d("UploadViewmodel", "Image URL saved to Firestore")
             }
             .addOnFailureListener { e ->
-                Log.e("UploadViewmodel", "Error saving URL", e)
+                Log.e("UploadViewmodel", "Error saving URL to Firestore", e)
+                _errorMessage.value = "Failed to save URL"
             }
     }
 
     fun fetchStoredImageUrl() {
-        val userId = Firebase.auth.currentUser?.uid ?: run {
+        val userId = currentUserId ?: run {
             _errorMessage.value = "Not logged in"
             return
         }
 
-        database.child("users").child(userId).child("imageUrl").get()
-            .addOnSuccessListener { snapshot ->
-                val url = snapshot.getValue(String::class.java)
-                if (url != null) {
-                    _downloadUrl.value = url
-                    _uploadState.value = UploadState.SUCCESS
-                    Log.d("FetchImage", "Image loaded from DB: $url")
+        firestore.collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val url = document.getString("imageUrl")
+                    if (!url.isNullOrEmpty()) {
+                        _downloadUrl.value = url
+                        _uploadState.value = UploadState.SUCCESS
+                        Log.d("UploadViewmodel", "🔥 Loaded URL: $url")
+                    } else {
+                        Log.d("UploadViewmodel", "No image URL found in Firestore")
+                    }
                 } else {
-                    _errorMessage.value = "No image found"
-                    Log.d("FetchImage", "No image URL in database")
+                    Log.d("UploadViewmodel", "No user document found")
                 }
             }
             .addOnFailureListener { e ->
+                Log.e("UploadViewmodel", "Error fetching URL", e)
                 _errorMessage.value = "Failed to load image"
-                Log.e("FetchImage", "Database read failed", e)
             }
     }
 
     fun uploadImage(imageUri: Uri) {
         _uploadState.value = UploadState.LOADING
         _uploadProgress.value = 0f
-        _downloadUrl.value = null
         _errorMessage.value = null
 
-        val user = auth.currentUser
-        if (user == null) {
+        val userId = currentUserId ?: run {
             _uploadState.value = UploadState.ERROR
             _errorMessage.value = "User not logged in"
             return
@@ -93,7 +107,7 @@ class UploadViewmodel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val imageFileName = "images/${user.uid}/${System.currentTimeMillis()}_${imageUri.lastPathSegment ?: "upload"}"
+                val imageFileName = "images/$userId/${System.currentTimeMillis()}_${imageUri.lastPathSegment ?: "upload"}"
                 val imageRef = storageRef.child(imageFileName)
 
                 val uploadTask = imageRef.putFile(imageUri)
@@ -103,15 +117,14 @@ class UploadViewmodel : ViewModel() {
                     _uploadProgress.value = progress.toFloat()
                 }.continueWithTask { task ->
                     if (!task.isSuccessful) {
-                        throw task.exception ?: Exception("Unknown upload error")
+                        throw task.exception ?: Exception("Upload failed")
                     }
                     imageRef.downloadUrl
                 }.addOnSuccessListener { uri ->
-                    _downloadUrl.value = uri.toString()
+                    val url = uri.toString()
+                    _downloadUrl.value = url
                     _uploadState.value = UploadState.SUCCESS
-                    downloadUrl?.let { url ->
-                        saveImageUrlToRealtimeDB(url.toString())
-                    }
+                    saveImageUrlToFirestore(url) // Save after successful upload
                 }.addOnFailureListener { e ->
                     _uploadState.value = UploadState.ERROR
                     _errorMessage.value = e.message ?: "Upload failed"
@@ -128,16 +141,5 @@ class UploadViewmodel : ViewModel() {
         _uploadProgress.value = 0f
         _downloadUrl.value = null
         _errorMessage.value = null
-    }
-
-    init {
-        setupAuthStateListener()
-    }
-
-    private fun setupAuthStateListener() {
-        Firebase.auth.addAuthStateListener { user ->
-            fetchStoredImageUrl()
-            Log.d("AuthState", "User logged in: ${user.uid}")
-        }
     }
 }
