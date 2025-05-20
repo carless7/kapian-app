@@ -28,6 +28,7 @@ class AuthenticationManager(val context: Context) {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        trySend(AuthResponse.Success)
                         task.result.user?.let { user ->
                             val userData = UserData(
                                 userId = user.uid,
@@ -45,7 +46,6 @@ class AuthenticationManager(val context: Context) {
                                     close()
                                 }
                                 .addOnFailureListener { e ->
-
                                     trySend(AuthResponse.Success)
                                     close()
                                 }

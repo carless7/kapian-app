@@ -18,8 +18,6 @@ class RegisterViewModel(
     private val _registerState = MutableStateFlow<AuthState>(AuthState.Idle)
     val registerState: StateFlow<AuthState> = _registerState
 
-    private val _emailVerificationState = MutableStateFlow<AuthState>(AuthState.Idle)
-
     fun register(email: String, password: String) {
         _registerState.value = AuthState.Loading
         viewModelScope.launch {
@@ -50,10 +48,5 @@ class RegisterViewModel(
                 }
             }
         }
-    }
-
-    fun clearStates() {
-        _registerState.value = AuthState.Idle
-        _emailVerificationState.value = AuthState.Idle
     }
 }

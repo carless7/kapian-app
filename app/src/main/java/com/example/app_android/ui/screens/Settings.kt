@@ -3,7 +3,6 @@ package com.example.app_android.ui.screens
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.provider.Settings
-import android.widget.Switch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,8 +22,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -39,13 +38,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.app_android.R
 import com.example.app_android.auth.AuthenticationManager
-import com.example.app_android.viewmodel.LoginViewModel
+import com.example.app_android.upload.NfcHceService
+import com.example.app_android.viewmodel.UploadViewmodel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navController: NavController,
-    authManager: AuthenticationManager
+    authManager: AuthenticationManager,
+    viewModel: UploadViewmodel
 ) {
     val context = LocalContext.current
     val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
@@ -134,6 +135,8 @@ fun SettingsScreen(
                     Button(
                         onClick = {
                             authManager.signOut()
+                            viewModel.resetState()
+                            NfcHceService.stopService(context)
                             navController.navigate("login") {
                                 popUpTo(0)
                             }

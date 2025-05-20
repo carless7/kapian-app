@@ -49,8 +49,4 @@ class LoginViewModel(
             }
         }
     }
-
-    fun clearStates() {
-        _loginState.value = AuthState.Idle
-    }
 }

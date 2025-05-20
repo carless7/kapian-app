@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +45,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -58,7 +58,7 @@ import com.example.app_android.viewmodel.UploadViewmodel
 @Composable
 fun MainScreen(
     navController: NavController,
-    viewModel: UploadViewmodel = viewModel()
+    viewModel: UploadViewmodel
 ) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
@@ -88,6 +88,10 @@ fun MainScreen(
             isNfcActive = true
             Toast.makeText(context, "NFC sharing activated", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchStoredImageUrl()
     }
 
     DisposableEffect(Unit) {
