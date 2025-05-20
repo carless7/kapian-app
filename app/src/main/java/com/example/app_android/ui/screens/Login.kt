@@ -197,7 +197,9 @@ fun LoginScreen(
                             append("Register")
                         }
                     },
-                    onClick = { navController.navigate("register") }
+                    onClick = { navController.navigate("main") {
+                        popUpTo("login") { inclusive = true }
+                    } }
                 )
             }
 

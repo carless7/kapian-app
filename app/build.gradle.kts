@@ -78,4 +78,8 @@ dependencies {
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
+
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    implementation("com.github.bumptech.glide:compose:1.0.0-alpha.1")
 }
