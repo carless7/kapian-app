@@ -172,16 +172,9 @@ fun MainScreen(
                     downloadUrl?.let { url ->
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                "Upload successful!",
+                                "Card Loaded!",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                url,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                                modifier = Modifier.padding(horizontal = 16.dp)
                             )
                         }
                     }
@@ -251,7 +244,7 @@ fun MainScreen(
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                     )
                 ) {
-                    Text("View in Browser")
+                    Text("Preview card")
                 }
             }
 
