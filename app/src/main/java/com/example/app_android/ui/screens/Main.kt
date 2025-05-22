@@ -49,6 +49,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.app_android.R
+import com.example.app_android.notifications.FcmTokenManager
 import com.example.app_android.upload.NfcHceService
 import com.example.app_android.viewmodel.UploadState
 import com.example.app_android.viewmodel.UploadViewmodel
@@ -92,6 +93,7 @@ fun MainScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchStoredImageUrl()
+        FcmTokenManager.refreshAndSaveToken()
     }
 
     DisposableEffect(Unit) {

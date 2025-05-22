@@ -1,4 +1,4 @@
-const functions = require("firebase-functions/v1"); // ✅ Use v1 for storage triggers
+const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
